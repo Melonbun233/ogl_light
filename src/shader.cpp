@@ -32,6 +32,11 @@ void Shader::setVec3(const string &name, vec3 value) const {
 	glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, value_ptr(value));
 }
 
+//set a vec4 uniform in the shader
+void Shader::setVec4(const string &name, vec4 value) const {
+	glUniform4fv(glGetUniformLocation(ID, name.c_str()), 1, value_ptr(value));
+}
+
 //constructor
 Shader::Shader(const char* vertexPath, const char* fragmentPath){
 		string vertexCode;

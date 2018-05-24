@@ -15,7 +15,9 @@ enum MOVEMENT {
 	FORWARD,
 	BACKWARD,
 	LEFT,
-	RIGHT
+	RIGHT,
+	UP,
+	DOWN
 };
 
 const float FOV_MAX = 45.0;

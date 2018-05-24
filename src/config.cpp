@@ -1,30 +1,7 @@
 #include "../include/config.h"
 //this file contains all config functions 
 
-void loadTexture(const char *path, int texture){
-	int width, height, channels;
-	glBindTexture(GL_TEXTURE_2D, texture);
-	//set texture wrapping/filtering options
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	//loading picture 
-	stbi_set_flip_vertically_on_load(true);
-	unsigned char *data = stbi_load(path, &width, &height, &channels, STBI_rgb_alpha);
-	if (data) 
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, 
-			GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-		cout << path << " texture successfully loaded" << endl;
-	}
-	else 
-	{
-		cout << "Failed to load texture" << endl;
-	}
-	stbi_image_free(data);
-}
+
 
 //process user input
 void processInput(GLFWwindow *window){
@@ -38,6 +15,8 @@ void processInput(GLFWwindow *window){
 		camera.processKeypad(LEFT, delta_time);
 	if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		camera.processKeypad(RIGHT, delta_time);
+	if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		camera.processKeypad(UP, delta_time);
 }
 
 //this callback function is called whenever the window size is changed

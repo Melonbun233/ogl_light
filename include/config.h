@@ -1,5 +1,5 @@
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef CONFIG_H
+#define CONFIG_H
 //this file contains all config functions used in this project, including the extern
 //variables that are used in main function.
 #include "glad/glad.h"
@@ -8,23 +8,17 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include "stb_image.h"
 #include "camera.h"
 
 using namespace std;
-//load texture and configure it as GL_REPEAT and GL_LINEAR for magnification and 
-//minization
-//PRE:
-//	path: path of the texture file, should be a image file
-//	texture: texture int created by OpenGL function
-void loadTexture(const char *path, int texture);
+
+extern float delta_time, MOUSE_X, MOUSE_Y;
+extern Camera camera;
+extern GLboolean MOUSE_FIRST;
 
 //process user input in the render loop
 //PRE:
 // window: user's window
-extern float delta_time, MOUSE_X, MOUSE_Y;
-extern Camera camera;
-extern GLboolean MOUSE_FIRST;
 void processInput(GLFWwindow *window);
 
 //this function is automatically called every time the window is resized

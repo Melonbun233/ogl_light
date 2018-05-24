@@ -16,10 +16,14 @@ using namespace glm;
 
 //define material and light struct
 struct Light {
+	vec4 direction;
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
-	vec3 position;
+	//attenuation
+	float constant;
+	float linear;
+	float quadra;
 };
 
 struct Material {
@@ -51,6 +55,8 @@ public:
 	void setMat4(const string &name, mat4 value) const;
 	//set a vec3 uniform in the shader
 	void setVec3(const string &name, vec3 value) const;
+	//set a vec4 uniform in the shader
+	void setVec4(const string &name, vec4 value) const;
 
 
 private:

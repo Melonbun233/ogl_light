@@ -11,6 +11,7 @@
 #include "../include/shader.h"
 #include "../include/config.h"
 #include "../include/data.h"
+#include "../include/utils.h"
 
 using namespace std;
 using namespace glm;
@@ -27,6 +28,7 @@ float delta_time = 0.0;
 float current_frame = 0.0;
 float last_frame = 0.0;
 extern float cube_vertices[];
+extern vec3 cube_pos[];
 
 //setting up camera
 Camera camera = Camera(vec3(0, 0, 6));
@@ -77,7 +79,6 @@ int main(){
 	Shader lampShader(vshader_path, lamp_fshader_path);
 	Shader lightShader(vshader_path, light_fshader_path);
 
-
 	//-----------------------load Vertices and Data--------------------------//
 	//create VAO
 	unsigned int cubeVAO, VBO;
@@ -108,9 +109,10 @@ int main(){
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	//light
-	//ambient, diffuse, specular, shininess
-	Light light = {vec3 (0.2f), vec3(0.8f), vec3(1.0f), vec3(1.0f, 1.5f, 1.0f)};
+	//point light
+	//direction/position, ambient, diffuse, specular, direction
+	Light light = {vec4(1.2, 1.0, 1.5, 1.0), vec3 (0.2f), vec3(0.8f), vec3(1.0f)};
+	setAttenuation(light, 100.0);
 	//--------------------------texture--------------------------------------//
 	unsigned int diffuse_map, specular_map, emission_map;
 	glGenTextures(1, &diffuse_map);
@@ -135,15 +137,13 @@ int main(){
 		delta_time = current_frame - last_frame;
 		last_frame = current_frame;
 		//clear last frame
-		glClearColor(0, 0, 0, 1.0f);
+		glClearColor(0.25, 0.25, 0.25, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//update model, view, projection
 		//drawing main object
 		lightShader.use();
-		mat4 view, proj, model;
-		model = translate(model, vec3(0.0f, 0.0f, 0.0f));
-		model = rotate(model, (float)glfwGetTime(), vec3(1.0f, 0.5f, 0.5f));
+		mat4 view, proj;
 		view = camera.getView();
 		proj = perspective(radians(camera.getFOV()), float(SCR_WIDTH/SCR_HEIGHT), 
 			0.1f, 100.0f);
@@ -154,9 +154,11 @@ int main(){
 		lightShader.setVec3("light.ambient", light.ambient);
 		lightShader.setVec3("light.diffuse", light.diffuse);
 		lightShader.setVec3("light.specular", light.specular);
-		lightShader.setVec3("light.position", light.position);
+		lightShader.setVec4("light.direction", light.direction);
+		lightShader.setFloat("light.constant", light.constant);
+		lightShader.setFloat("light.linear", light.linear);
+		lightShader.setFloat("light.quadra", light.quadra);
 
-		lightShader.setMat4("model", model);
 		lightShader.setMat4("view", view);
 		lightShader.setMat4("proj", proj);
 		lightShader.setVec3("viewPos", camera.Position);
@@ -168,14 +170,26 @@ int main(){
 		glBindTexture(GL_TEXTURE_2D, specular_map);
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, emission_map);
+
 		//draw objects
 		glBindVertexArray(cubeVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		for (int i = 0; i < 10; i ++)
+		{
+			mat4 model;
+			model = translate(model, cube_pos[i]);
+			float angle = 20.0f * i;
+			model = rotate(model, radians(angle), vec3(1.0f, 0.3f, 0.5f));
+			lightShader.setMat4("model", model);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+
 
 		//drawing lamp
 		lampShader.use();
 		mat4 lampModel;
-		lampModel = translate(lampModel, light.position);
+		vec3 position = vec3(light.direction.x, light.direction.y, 
+			light.direction.z);
+		lampModel = translate(lampModel, position);
 		lampModel = scale(lampModel, vec3(0.2f));
 		lampShader.setMat4("model", lampModel);
 		lampShader.setMat4("view", view);

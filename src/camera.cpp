@@ -35,6 +35,15 @@ void Camera::processKeypad(MOVEMENT direction, float delta_time) {
 			Position += glm::normalize(glm::cross(Front, Up)) * speed;
 			break;
 		}
+		case UP:{
+			glm::vec3 right = glm::cross(Front, Up);
+			Position += glm::normalize(glm::cross(right, Front)) * speed;
+			break;
+		}
+		case DOWN:{
+			glm::vec3 right = glm::cross(Front, Up);
+			Position -= glm::normalize(glm::cross(right, Front)) * speed;
+		}
 	}
 }
 
