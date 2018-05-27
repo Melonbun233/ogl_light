@@ -3,10 +3,8 @@
 
 #include "glad/glad.h"
 #include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-#include <string>
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -46,17 +44,29 @@ public:
 	void use();
 
 	//set a bool uniform in the shader
-	void setBool(const string &name, bool value) const;
+	void setBool(const char *name, bool value) const {
+		glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
+	}
 	//set a integer uniform in the shader
-	void setInt(const string &name, int value) const;
+	void setInt(const char *name, int value) const {
+		glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
+	}
 	//set a float uniform in the shader
-	void setFloat(const string &name, float value) const;
+	void setFloat(const char *name, float value) const {
+		glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
+	}
 	//set a mat4 unifrom in the shader
-	void setMat4(const string &name, mat4 value) const;
+	void setMat4(const char *name, mat4 value) const {
+		glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, value_ptr(value));
+	}
 	//set a vec3 uniform in the shader
-	void setVec3(const string &name, vec3 value) const;
+	void setVec3(const char *name, vec3 value) const {
+		glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, value_ptr(value));
+	}
 	//set a vec4 uniform in the shader
-	void setVec4(const string &name, vec4 value) const;
+	void setVec4(const char *name, vec4 value) const {
+		glUniform4fv(glGetUniformLocation(ID, name.c_str()), 1, value_ptr(value));
+	}
 
 
 private:
