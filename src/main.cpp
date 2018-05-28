@@ -47,7 +47,7 @@ int main(){
 	GLFWwindow *window = init(SCR_WIDTH, SCR_HEIGHT, window_name);
 	if(window == NULL)
 		return -1;
-	
+
 	if(MOUSE_VERTICAL_INVERSE)
 		camera.setMouseVerticalInverse(true);
 	if(MOUSE_HORIZONTAL_INVERSE)
@@ -89,11 +89,12 @@ int main(){
 	//--------------------------configure light------------------------------//
 	//direction/position, ambient, diffuse, specular, direction
 	lightShader.use();
-	const int dirLightsNum = 1;
+	const int dirLightsNum = 2;
 	const int pointLightsNum = 2;
 	const int spotLightsNum = 2;
 	DirLight dirLights[] = {
-		DirLight(vec3(1.0, 1.0, 1.0), vec3(-0.2, -1.0, -0.3), vec3(0.05f), vec3(0.2f), vec3(0.8f))
+		DirLight(vec3(1.0, 1.0, 1.0), vec3(-0.2, -1.0, -0.3), vec3(0.1), vec3(0.3), vec3(0.8)),
+		DirLight(vec3(1.0, 0.0, 0.0), vec3(0.2, 1.0, 0.3), vec3(0.1), vec3(0.3), vec3(0.8))
 	};
 
 	PointLight pointLights[] = {
@@ -145,8 +146,8 @@ int main(){
 			0.1f, 100.0f);
 
 		//light
-		//sendDirLights(dirLights, dirLightsNum, lightShader);
-		//sendPointLights(pointLights, pointLightsNum, lightShader);
+		sendDirLights(dirLights, dirLightsNum, lightShader);
+		sendPointLights(pointLights, pointLightsNum, lightShader);
 		sendSpotLights(spotLights, spotLightsNum, lightShader);
 
 		lightShader.setMat4("view", view);
