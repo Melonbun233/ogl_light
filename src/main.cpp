@@ -20,10 +20,10 @@ using namespace glm;
 #define PI 3.14159265
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
-const char *vshader_path = "../resources/shader/vshader.vs";
-const char *fshader_path = "../resources/shader/fshader.fs";
-const char *light_fshader_path = "../resources/shader/light.fs";
-const char *lamp_fshader_path = "../resources/shader/lamp.fs";
+const string vshader_path = "../resources/shader/vshader.vs";
+const string fshader_path = "../resources/shader/fshader.fs";
+const string light_fshader_path = "../resources/shader/light.fs";
+const string lamp_fshader_path = "../resources/shader/lamp.fs";
 
 float delta_time = 0.0;
 float current_frame = 0.0;
@@ -119,9 +119,9 @@ int main(){
 	glGenTextures(1, &diffuse_map);
 	glGenTextures(1, &specular_map);
 	glGenTextures(1, &emission_map);
-	const char *diffuse_path = "../resources/textures/container.png";
-	const char *specular_path = "../resources/textures/container_specular.png";
-	const char *emission_path = "../resources/textures/matrix.jpg";
+	const string diffuse_path = "../resources/textures/container.png";
+	const string specular_path = "../resources/textures/container_specular.png";
+	const string emission_path = "../resources/textures/matrix.jpg";
 	loadTexture(diffuse_path, diffuse_map);
 	loadTexture(specular_path, specular_map);
 	loadTexture(emission_path, emission_map);

@@ -8,9 +8,9 @@ void Shader::use(){
 
 
 //constructor
-Shader::Shader(const char* vertexPath, const char* fragmentPath){
-		string vertexCode;
-		string fragmentCode;
+Shader::Shader(const string &vertexPath, const sting &fragmentPath){
+		std::string vertexCode;
+		std::string fragmentCode;
 		ifstream vShaderFile;
 		ifstream fShaderFile;
 		//check ifstream objects can throw exception
@@ -33,7 +33,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath){
 			fragmentCode = fShaderStream.str();
 			//cout << fragmentCode << endl;
 		} catch (ifstream::failure e) {
-			cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ: " << e.what() << endl;
+			std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ: " << e.what() << std::endl;
 		}
 
 		const char* vShaderCode = vertexCode.c_str();
@@ -66,7 +66,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath){
 }
 
 // check whether shader is compiled succesfully
-void Shader::checkShaderSuccess(unsigned int shader, const char *type){
+void Shader::checkShaderSuccess(unsigned int shader, const string &type){
 	int success;
 	char infoLog[512];
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);

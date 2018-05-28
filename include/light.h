@@ -6,7 +6,6 @@
 
 #include "glad/glad.h"
 #include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 #include <string>
 
 //include all other derived class
@@ -16,43 +15,44 @@
 
 #include "shader.h"
 
-using namespace glm;
-using namespace std;
 
 class Light
 {
 public:
-	vec3 direction;	//direction of the light. from light source to the fragment
-	vec3 position; 	//position of the light
+	glm::vec3 direction;	//direction of the light. from light source to the fragment
+	glm::vec3 position; 	//position of the light
 
-	vec3 ambient;	//ambient color and stength of it
-	vec3 diffuse;	//diffuse color and stength of it
-	vec3 specular;	//specular color and stength of it
+	glm::vec3 ambient;	//ambient color and stength of it
+	glm::vec3 diffuse;	//diffuse color and stength of it
+	glm::vec3 specular;	//specular color and stength of it
 
 	//default constructor
 	Light() = default;
-	Light(vec3 dir, vec3 pos, vec3 amb, vec3 diff, vec3 spec) : direction(dir), 
-		position(pos), ambient(amb), diffuse(diff), specular(spec) { }
+	Light(glm::vec3 dir, glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec) 
+		: direction(dir), position(pos), ambient(amb), diffuse(diff), specular(spec){}
 
 	//this function send light's spec into the shader
 	//Pre: 
 	//	shader: shader needs to be configured
 	//	name: light's name in the shader, the light should be the same type as 
 	//	the light class here
-	virtual void sendShader(Shader shader, const char* name) const {
+	virtual void sendShader(Shader shader, const std::string &name) const {
 		string str1(name);
 		string str2(name);
 		string str3(name);
 		string str4(name);
+		string str5(name);
 
 		str1.append(".direction");
-		shader.setVec3(str1.c_str(), direction);
+		shader.setVec3(str1, direction);
 		str2.append(".position");
-		shader.setVec3(str2.c_str(), position);
+		shader.setVec3(str2, position);
 		str3.append(".ambient");
-		shader.setVec3(str3.c_str(), ambient);
-		str4.append(".specular");
-		shader.setVec3(str4.c_str(), specular);
+		shader.setVec3(str3, ambient);
+		str4.append(".diffuse");
+		shader.setVec3(str4, diffuse);
+		str5.append(".specular");
+		shader.setVec3(str5, specular);
 	}
 
 }

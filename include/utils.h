@@ -3,11 +3,9 @@
 //this file contains all math and utility functions
 #include "glad/glad.h"
 #include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 #include "stb_image.h"
 #include "shader.h"
 
-using namespace std;
 
 //distance constant linear quadratic
 extern int att_table_size;
@@ -18,7 +16,7 @@ extern float att_table[];
 //PRE:
 //	path: path of the texture file, should be a image file
 //	texture: texture int created by OpenGL function
-void loadTexture(const char *path, int texture);
+void loadTexture(const std::string &path, int texture);
 
 //set light's attenuation variables
 //there are three variables: constant, linear and quadratic

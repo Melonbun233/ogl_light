@@ -9,8 +9,6 @@
 
 #include <string>
 
-using namespace glm;
-using namespace std;
 
 //this is a derived class from light base class.
 //you should use this class instead of Light
@@ -23,10 +21,10 @@ public:
 	//position is set to zero in this constructor because directional light 
 	//desn't have a postion direction vector is pointing from 
 	//the light source to the fragment
-	DirLight(vec3 dir, vec3 amb, vec3 diff, vec3 spec); 
+	DirLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec); 
 
 	//send all vectors to a specific shader with light's name
-	void sendShader(Shader shader, const char *name) const override;
+	void sendShader(Shader shader, const std::string &name) const override;
 }
 
 

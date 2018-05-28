@@ -10,25 +10,22 @@
 
 #include <string>
 
-using namespace glm;
-using namespace std;
-
 class PointLight() : public Light {
 public:
-	vec3 range;		//this light's range. large value results in large covering area
+	glm::vec3 range;	//this light's range. large value results in large covering area
 
 	//default constructor
 	PointLight() = default;
 	//direction is 0 because point light doesn't have a direction
-	PointLight(vec3 pos, vec3 amb, vec3 diff, vec3 spec, vec3 range);
+	PointLight(glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec, glm::vec3 range);
 
 	//send all vectors to a specific shader with light's name
-	void sendShader(Shader shader, const char *name) const override;
+	void sendShader(Shader shader, const std::string &name) const override;
 
 private:
-	vec3 constant;	//constant coefficient of attenuation	
-	vec3 linear;	//linear coefficient of attenuation
-	vec3 quadra;	//quadra coefficient of attenuation
+	glm::vec3 constant;	//constant coefficient of attenuation	
+	glm::vec3 linear;	//linear coefficient of attenuation
+	glm::vec3 quadra;	//quadra coefficient of attenuation
 	//set all coefficients from range
 	void setAttenuation();
 }

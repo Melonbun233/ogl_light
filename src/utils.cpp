@@ -1,4 +1,5 @@
 #include "../include/utils.h"
+using namespace std;
 //this file contains all math and other utility functions
 
 int att_table_size = 12;
@@ -18,7 +19,7 @@ float att_table[] = {
 };
 
 //load textures
-void loadTexture(const char *path, int texture){
+void loadTexture(const string &path, int texture){
 	int width, height, channels;
 	glBindTexture(GL_TEXTURE_2D, texture);
 	//set texture wrapping/filtering options

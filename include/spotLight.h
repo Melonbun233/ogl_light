@@ -4,14 +4,11 @@
 //you should use this class instead of the original base class Light
 #include "glad/glad.h"
 #include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 #include "shader.h"
 #include "light.h"
 
 #include <string>
 
-using namespace glm;
-using namespace std;
 
 class SpotLight : public Ligght {
 public:
@@ -20,8 +17,8 @@ public:
 	//default constructor
 	SpotLight() = default;
 	//direction and position are both required for a spot light
-	SpotLight(vec3 dir, vec3 pos, vec3 amb, vec3 diff, vec3 spec, float cut);
+	SpotLight(glm::vec3 dir, glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec, float cut);
 
 	//send all vectors to a specific shader with light's name
-	void sendShader(Shader shader, const char *name) const override;
+	void sendShader(Shader shader, const std::string &name) const override;
 }
