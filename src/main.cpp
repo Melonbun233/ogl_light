@@ -13,6 +13,10 @@
 #include "../include/config.h"
 #include "../include/data.h"
 #include "../include/utils.h"
+#include "../include/light.h"
+#include "../include/dirLight.h"
+#include "../include/pointLight.h"
+#include "../include/spotLight.h"
 
 using namespace std;
 using namespace glm;
@@ -110,11 +114,14 @@ int main(){
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	//point light
+	//--------------------------configure light------------------------------//
 	//direction/position, ambient, diffuse, specular, direction
-	Light light = {vec4(1.2, 1.0, 1.5, 1.0), vec3 (0.2f), vec3(0.8f), vec3(1.0f)};
-	setAttenuation(light, 100.0);
-	//--------------------------texture--------------------------------------//
+	lightShader.use();
+	DirLight dirLight(vec3(-0.2, -1.0, -0.3), vec3 (0.2f), vec3(0.8f), vec3(1.0f));
+	PointLight pointLight(vec3(1.0, 2.0, 2.0), vec3(0.2f), vec3(0.8f), vec3(1.0f), 100.0f);
+	SpotLight spotLight(vec3(-0.5, -1.5, -2.0), vec3(1.0, 2.0, 2.0), vec3(0.2), 
+		vec3(0.8), vec3(1.0), 20.0, 25.0);
+	//--------------------------material and texture----------------------------//
 	unsigned int diffuse_map, specular_map, emission_map;
 	glGenTextures(1, &diffuse_map);
 	glGenTextures(1, &specular_map);
@@ -127,9 +134,11 @@ int main(){
 	loadTexture(emission_path, emission_map);
 
 	lightShader.use();
-	lightShader.setInt("material.diffuse", 0);	//texture0
-	lightShader.setInt("material.specular", 1);	//texture1
-	lightShader.setInt("material.emission", 2); //texture2
+	lightShader.setInt("material.ambient", 0);  //TEXTURE0
+	lightShader.setInt("material.diffuse", 1);	//TEXTURE1
+	lightShader.setInt("material.specular", 2);	//TEXTURE2
+	lightShader.setInt("material.emission", 3); //TEXTURE3
+	lightShader.setFloat("material.shininess", 64.0);
 	//-----------------------resndering loop---------------------------------//
 	while (!glfwWindowShouldClose(window)){
 		processInput(window);
@@ -148,28 +157,24 @@ int main(){
 		view = camera.getView();
 		proj = perspective(radians(camera.getFOV()), float(SCR_WIDTH/SCR_HEIGHT), 
 			0.1f, 100.0f);
-		//material and textures
 
-		lightShader.setFloat("material.shininess", 64.0);
 		//light
-		lightShader.setVec3("light.ambient", light.ambient);
-		lightShader.setVec3("light.diffuse", light.diffuse);
-		lightShader.setVec3("light.specular", light.specular);
-		lightShader.setVec4("light.direction", light.direction);
-		lightShader.setFloat("light.constant", light.constant);
-		lightShader.setFloat("light.linear", light.linear);
-		lightShader.setFloat("light.quadra", light.quadra);
+		//dirLight.sendShader(lightShader, "dirLight");
+		//pointLight.sendShader(lightShader, "pointLight");
+		spotLight.sendShader(lightShader, "spotLight");
 
 		lightShader.setMat4("view", view);
 		lightShader.setMat4("proj", proj);
 		lightShader.setVec3("viewPos", camera.Position);
 
-		lightShader.setFloat("time", (float)glfwGetTime());
+		//for this one, we use diffuse map as ambient map
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, diffuse_map);
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, specular_map);
+		glBindTexture(GL_TEXTURE_2D, diffuse_map);
 		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, specular_map);
+		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, emission_map);
 
 		//draw objects
@@ -183,13 +188,10 @@ int main(){
 			lightShader.setMat4("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
-
-
 		//drawing lamp
 		lampShader.use();
 		mat4 lampModel;
-		vec3 position = vec3(light.direction.x, light.direction.y, 
-			light.direction.z);
+		vec3 position = pointLight.position;
 		lampModel = translate(lampModel, position);
 		lampModel = scale(lampModel, vec3(0.2f));
 		lampShader.setMat4("model", lampModel);

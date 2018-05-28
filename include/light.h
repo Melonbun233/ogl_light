@@ -9,10 +9,6 @@
 #include <string>
 
 //include all other derived class
-#include "dirLight.h"
-#include "pointLihgt.h"
-#include "spotLight.h"
-
 #include "shader.h"
 
 
@@ -36,25 +32,20 @@ public:
 	//	shader: shader needs to be configured
 	//	name: light's name in the shader, the light should be the same type as 
 	//	the light class here
-	virtual void sendShader(Shader shader, const std::string &name) const {
-		string str1(name);
-		string str2(name);
-		string str3(name);
-		string str4(name);
-		string str5(name);
+	virtual void sendShader(Shader &shader, const std::string &name) const {
+		std::string dir(name);
+		std::string pos(name);
+		std::string amb(name);
+		std::string diff(name);
+		std::string spec(name);
 
-		str1.append(".direction");
-		shader.setVec3(str1, direction);
-		str2.append(".position");
-		shader.setVec3(str2, position);
-		str3.append(".ambient");
-		shader.setVec3(str3, ambient);
-		str4.append(".diffuse");
-		shader.setVec3(str4, diffuse);
-		str5.append(".specular");
-		shader.setVec3(str5, specular);
+
+		shader.setVec3(dir.append(".direction"), direction);
+		shader.setVec3(pos.append(".position"), position);
+		shader.setVec3(amb.append(".ambient"), ambient);
+		shader.setVec3(diff.append(".diffuse"), diffuse);
+		shader.setVec3(spec.append(".specular"), specular);
 	}
-
-}
+};
 
 #endif

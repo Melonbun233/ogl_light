@@ -10,15 +10,19 @@
 #include <string>
 
 
-class SpotLight : public Ligght {
+class SpotLight : public Light {
 public:
-	float cutoff; //the angle specifies light's radius. this value should between
+	float inner_cutoff; //the angle specifies light's radius. this value should between
 				  // 0 - 180 (inclusive)
+	float outer_cutoff;	
 	//default constructor
 	SpotLight() = default;
 	//direction and position are both required for a spot light
-	SpotLight(glm::vec3 dir, glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec, float cut);
+	SpotLight(glm::vec3 dir, glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec, 
+		float innner, float outer);
 
 	//send all vectors to a specific shader with light's name
-	void sendShader(Shader shader, const std::string &name) const override;
-}
+	void sendShader(Shader &shader, const std::string &name) const override;
+};
+
+#endif

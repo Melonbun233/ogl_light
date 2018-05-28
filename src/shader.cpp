@@ -8,19 +8,19 @@ void Shader::use(){
 
 
 //constructor
-Shader::Shader(const string &vertexPath, const sting &fragmentPath){
+Shader::Shader(const std::string &vertexPath, const std::string &fragmentPath){
 		std::string vertexCode;
 		std::string fragmentCode;
-		ifstream vShaderFile;
-		ifstream fShaderFile;
+		std::ifstream vShaderFile;
+		std::ifstream fShaderFile;
 		//check ifstream objects can throw exception
-		vShaderFile.exceptions(ifstream::failbit | ifstream::badbit);
-		fShaderFile.exceptions(ifstream::failbit | ifstream::badbit);
+		vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+		fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 		try {
 			//open files
 			vShaderFile.open(vertexPath);
 			fShaderFile.open(fragmentPath);
-			stringstream vShaderStream, fShaderStream;
+			std::stringstream vShaderStream, fShaderStream;
 			//read file's buffer contentes into streams
 			vShaderStream << vShaderFile.rdbuf();
 			fShaderStream << fShaderFile.rdbuf();
@@ -32,7 +32,7 @@ Shader::Shader(const string &vertexPath, const sting &fragmentPath){
 			//cout << vertexCode << endl;
 			fragmentCode = fShaderStream.str();
 			//cout << fragmentCode << endl;
-		} catch (ifstream::failure e) {
+		} catch (std::ifstream::failure e) {
 			std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ: " << e.what() << std::endl;
 		}
 
@@ -66,7 +66,7 @@ Shader::Shader(const string &vertexPath, const sting &fragmentPath){
 }
 
 // check whether shader is compiled succesfully
-void Shader::checkShaderSuccess(unsigned int shader, const string &type){
+void Shader::checkShaderSuccess(unsigned int shader, const std::string &type){
 	int success;
 	char infoLog[512];
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
@@ -74,10 +74,10 @@ void Shader::checkShaderSuccess(unsigned int shader, const string &type){
 	if(!success)
 	{
 		glGetShaderInfoLog(shader, 512, NULL, infoLog);
-		cout << type << " shader compilation error\n" << infoLog << endl;
+		std::cout << type << " shader compilation error\n" << infoLog << std::endl;
 		return;
 	}
-	cout << "Shader compilation successful" << endl;
+	std::cout << "Shader compilation successful" << std::endl;
 }
 // check whether shader program is succesfully linked
 void Shader::checkLinkSuccess(unsigned int ID){
@@ -87,9 +87,9 @@ void Shader::checkLinkSuccess(unsigned int ID){
 	if (!success)
 	{
 		glGetProgramInfoLog(ID, 512, NULL, infoLog);
-		cout << "Shader Program Linking Error\n" << infoLog << endl;
+		std::cout << "Shader Program Linking Error\n" << infoLog << std::endl;
 		return;
 	}
 
-	cout << "Shader program linking successful" << endl;
+	std::cout << "Shader program linking successful" << std::endl;
 }

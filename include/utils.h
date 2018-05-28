@@ -18,13 +18,4 @@ extern float att_table[];
 //	texture: texture int created by OpenGL function
 void loadTexture(const std::string &path, int texture);
 
-//set light's attenuation variables
-//there are three variables: constant, linear and quadratic
-//F_att = 1.0 / (constant + linear * d + quadratic * d ^ 2)
-//where d is distance from the fragment to the lisght source
-//PRE:
-//	light: light object
-//	distance: largest distance from a object to the light source
-void setAttenuation(Light &light, float distance);
-
 #endif

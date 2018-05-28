@@ -24,8 +24,8 @@ public:
 	DirLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec); 
 
 	//send all vectors to a specific shader with light's name
-	void sendShader(Shader shader, const std::string &name) const override;
-}
+	void sendShader(Shader &shader, const std::string &name) const override;
+};
 
 
 #endif
