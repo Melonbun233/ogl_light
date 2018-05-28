@@ -42,9 +42,14 @@ in vec3 FragPos;
 in vec3 Normal;
 out vec4 FragColor;
 
-uniform DirLight dirLight; 
-uniform PointLight pointLight;
-uniform SpotLight spotLight;
+uniform int NUM_DIR_LIGHTS
+uniform int NUM_POINT_LIGHTS
+uniform int NUM_SPOT_LIGHTS
+
+uniform DirLight dirLights[NUM_DIR_LIGHTS]; 
+uniform PointLight pointLights[NUM_POINT_LIGHTS];
+uniform SpotLight spotLights[NUM_SPOT_LIGHTS];
+
 uniform Material material;
 uniform vec3 viewPos;
 
@@ -64,9 +69,9 @@ void main()
 	vec3 norm = normalize(Normal);
 	vec3 viewDir = normalize(viewPos - FragPos);
 
-	//vec3 result = processDirLight(dirLight, norm, viewDir);
-	//vec3 result = processPointLight(pointLight, norm, viewDir);
-	vec3 result = processSpotLight(spotLight, norm, viewDir);
+	vec3 result = processDirLight(dirLight, norm, viewDir);
+	result += processPointLight(pointLight, norm, viewDir);
+	result += processSpotLight(spotLight, norm, viewDir);
 
 	FragColor = vec4(result, 1.0);
 
@@ -98,20 +103,16 @@ vec3 processPointLight(PointLight light, vec3 normal, vec3 viewDir)
 vec3 processSpotLight(SpotLight light, vec3 normal, vec3 viewDir)
 {
 	vec3 lightDir = normalize(light.position - FragPos);
-	//calculate theta
+	//calculate theta, angle between light direction and frag direction
 	float theta = dot(lightDir, normalize(-light.direction));
 	float epsilon = light.inner_cutoff - light.outer_cutoff;
 	float intensity = clamp((theta - light.outer_cutoff) / epsilon, 0.0, 1.0);
 	vec3 ambient, diffuse, specular;
-	if(theta > light.inner_cutoff) {
-		//do light calculation
-		ambient = calcAmbient(light.ambient);
-		diffuse = calcDiffuse(light.diffuse, normal, lightDir);
-		specular = calcSpecular(light.specular, normal, lightDir, viewDir);
-	} else {
-		//only ambient light
-		ambient = calcAmbient(light.ambient);
-	}
+	//do light calculation
+	ambient = calcAmbient(light.ambient);
+	diffuse = calcDiffuse(light.diffuse, normal, lightDir);
+	specular = calcSpecular(light.specular, normal, lightDir, viewDir);
+
 	return ambient + intensity * (diffuse + specular);
 }
 

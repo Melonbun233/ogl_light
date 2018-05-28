@@ -3,7 +3,8 @@ using namespace std;
 //this file contains all math and other utility functions
 
 //load textures
-void loadTexture(const string &path, int texture){
+void loadTexture(const string &path, int texture)
+{
 	int width, height, channels;
 	glBindTexture(GL_TEXTURE_2D, texture);
 	//set texture wrapping/filtering options
@@ -26,4 +27,25 @@ void loadTexture(const string &path, int texture){
 		cout << "Failed to load texture" << endl;
 	}
 	stbi_image_free(data);
+}
+
+void sendPointLights(PointLight lights[], int light_num, Shader &shader)
+{
+	for (int i = 0; i < light_num; i ++){
+		lights[i].sendShader(shader, "pointLights[" + i + "]");
+	}
+}
+
+void sendDirLights(DirLight lights[], int light_num, Shader &shader)
+{
+	for (int i = 0; i < light_num; i ++){
+		lights[i].sendShader(shader, "dirLights[" + i + "]");
+	}
+}
+
+void sendSpotLights(SpotLight lights[], int light_num, Shader &shader)
+{
+	for (int i = 0; i < light_num; i ++){
+		lights[i].sendShader(shader, "SpotLights[" + i + "]");
+	}
 }

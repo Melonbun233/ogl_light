@@ -12,8 +12,7 @@
 
 class SpotLight : public Light {
 public:
-	float inner_cutoff; //the angle specifies light's radius. this value should between
-				  // 0 - 180 (inclusive)
+	float inner_cutoff; //the angle specifies light's radius. 
 	float outer_cutoff;	
 	//default constructor
 	SpotLight() = default;

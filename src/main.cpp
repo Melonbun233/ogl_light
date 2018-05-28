@@ -18,12 +18,15 @@
 #include "../include/pointLight.h"
 #include "../include/spotLight.h"
 
+#define PI 3.14159265
 using namespace std;
 using namespace glm;
 
-#define PI 3.14159265
+
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
+const int dirLightsNum = 1;
+const int pointLightsNum = 4;
 const string vshader_path = "../resources/shader/vshader.vs";
 const string fshader_path = "../resources/shader/fshader.fs";
 const string light_fshader_path = "../resources/shader/light.fs";
@@ -117,10 +120,17 @@ int main(){
 	//--------------------------configure light------------------------------//
 	//direction/position, ambient, diffuse, specular, direction
 	lightShader.use();
-	DirLight dirLight(vec3(-0.2, -1.0, -0.3), vec3 (0.2f), vec3(0.8f), vec3(1.0f));
-	PointLight pointLight(vec3(1.0, 2.0, 2.0), vec3(0.2f), vec3(0.8f), vec3(1.0f), 100.0f);
-	SpotLight spotLight(vec3(-0.5, -1.5, -2.0), vec3(1.0, 2.0, 2.0), vec3(0.2), 
-		vec3(0.8), vec3(1.0), 20.0, 25.0);
+	DirLight dirLights[dirLightsNum] = {
+		DirLight(vec3(-0.2, -1.0, -0.3), vec3 (0.2f), vec3(0.8f), vec3(1.0f))
+	};
+
+	PointLight pointLights[pointLightsNum] = {
+		PointLight(vec3(1.0, 2.0, 2.0), vec3(0.2f), vec3(0.8f), vec3(1.0f), 50.0f),
+		PointLight(vec3(1.0, 2.0, -2.0), vec3(0.2f), vec3(0.8f), vec3(1.0f), 50.0f),
+		PointLight(vec3(0.0, 0.0, -10.0), vec3(0.2f), vec3(0.8f), vec3(1.0f), 10.0f),
+		PointLight(vec3(-2.0, -2.0, -3.0), vec3(0.2f), vec3(0.8f), vec3(1.0f), 30.0f)
+	};
+	
 	//--------------------------material and texture----------------------------//
 	unsigned int diffuse_map, specular_map, emission_map;
 	glGenTextures(1, &diffuse_map);
@@ -159,9 +169,8 @@ int main(){
 			0.1f, 100.0f);
 
 		//light
-		//dirLight.sendShader(lightShader, "dirLight");
-		//pointLight.sendShader(lightShader, "pointLight");
-		spotLight.sendShader(lightShader, "spotLight");
+		sendDirLights(dirLights, dirLightsNum, lightShader);
+		sendPointLights(pointLights, pointLightsNum, lightShader);
 
 		lightShader.setMat4("view", view);
 		lightShader.setMat4("proj", proj);
@@ -190,16 +199,17 @@ int main(){
 		}
 		//drawing lamp
 		lampShader.use();
-		mat4 lampModel;
-		vec3 position = pointLight.position;
-		lampModel = translate(lampModel, position);
-		lampModel = scale(lampModel, vec3(0.2f));
-		lampShader.setMat4("model", lampModel);
-		lampShader.setMat4("view", view);
-		lampShader.setMat4("proj", proj);
-
-		glBindVertexArray(lampVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		for (int i = 0; i < pointLightsNum; i ++)
+		{
+			mat4 lampModel;
+			lampModel = translate(lampModel, pointLights[i].position);
+			lampModel = scale(lampModel, vec3(0.2f));
+			lampShader.setMat4("model", lampModel);
+			lampShader.setMat4("view", view);
+			lampShader.setMat4("proj", proj);
+			glBindVertexArray(lampVAO);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -211,6 +221,4 @@ int main(){
 
 	glfwTerminate();
 	return 0;
-
-
 }
