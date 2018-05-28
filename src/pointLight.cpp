@@ -20,16 +20,6 @@ const float PointLight::att_table[] = {
 	3250.0, 1.0, 	0.0014, 0.000007
 };
 
-PointLight::PointLight(vec3 pos, vec3 amb, vec3 diff, vec3 spec, float _range)
-{
-	direction = vec3(0); //point light doesn't have a direction
-	position = pos;
-	ambient = amb;
-	diffuse = diff;
-	specular = spec;
-	setAttenuation(_range);
-}
-
 //get attenuation values
 void PointLight::setAttenuation(float _range){
 	range = _range;
@@ -58,9 +48,9 @@ void PointLight::sendShader(Shader &shader, const string &name) const
 	string quad(name);
 
 	shader.setVec3(pos.append(".position"), position);
-	shader.setVec3(amb.append(".ambient"), ambient);
-	shader.setVec3(diff.append(".diffuse"), diffuse);
-	shader.setVec3(spec.append(".specular"), specular);
+	shader.setVec3(amb.append(".ambient"), ambient * color);
+	shader.setVec3(diff.append(".diffuse"), diffuse * color);
+	shader.setVec3(spec.append(".specular"), specular * color);
 	shader.setFloat(cons.append(".constant"), constant);
 	shader.setFloat(lin.append(".linear"), linear);
 	shader.setFloat(quad.append(".quadra"), quadra);

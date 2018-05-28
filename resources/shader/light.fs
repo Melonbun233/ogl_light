@@ -42,13 +42,14 @@ in vec3 FragPos;
 in vec3 Normal;
 out vec4 FragColor;
 
-uniform int NUM_DIR_LIGHTS
-uniform int NUM_POINT_LIGHTS
-uniform int NUM_SPOT_LIGHTS
+#define LIGHTS_LIMIT 10
+uniform int DIR_LIGHTS_NUM;
+uniform int POINT_LIGHTS_NUM;
+uniform int SPOT_LIGHTS_NUM;
 
-uniform DirLight dirLights[NUM_DIR_LIGHTS]; 
-uniform PointLight pointLights[NUM_POINT_LIGHTS];
-uniform SpotLight spotLights[NUM_SPOT_LIGHTS];
+uniform DirLight dirLights[LIGHTS_LIMIT]; 
+uniform PointLight pointLights[LIGHTS_LIMIT];
+uniform SpotLight spotLights[LIGHTS_LIMIT];
 
 uniform Material material;
 uniform vec3 viewPos;
@@ -59,61 +60,75 @@ vec3 calcDiffuse(vec3 light_diff, vec3 normal, vec3 lightDir);
 vec3 calcSpecular(vec3 light_spec, vec3 normal, vec3 lightDir, vec3 viewDir);
 
 //functions to calculate different light type
-vec3 processDirLight(DirLight light, vec3 normal, vec3 viewDir);
-vec3 processPointLight(PointLight light, vec3 normal, vec3 viewDir);
-vec3 processSpotLight(SpotLight light, vec3 normal, vec3 viewDir);
+vec3 processDirLights(vec3 normal, vec3 viewDir);
+vec3 processPointLights(vec3 normal, vec3 viewDir);
+vec3 processSpotLights(vec3 normal, vec3 viewDir);
 
 void main()
 {
 	//light properties
 	vec3 norm = normalize(Normal);
 	vec3 viewDir = normalize(viewPos - FragPos);
+	vec3 result;
 
-	vec3 result = processDirLight(dirLight, norm, viewDir);
-	result += processPointLight(pointLight, norm, viewDir);
-	result += processSpotLight(spotLight, norm, viewDir);
+	result += processDirLights(norm, viewDir);
+	result += processPointLights(norm, viewDir);
+	result += processSpotLights(norm, viewDir);
 
 	FragColor = vec4(result, 1.0);
 
 }
 
-vec3 processDirLight(DirLight light, vec3 normal, vec3 viewDir)
+vec3 processDirLights(vec3 normal, vec3 viewDir)
 {
-	vec3 lightDir = normalize(-light.direction);
-	vec3 ambient = calcAmbient(light.ambient);
-	vec3 diffuse = calcDiffuse(light.diffuse, normal, lightDir);
-	vec3 specular = calcSpecular(light.specular, normal, lightDir, viewDir);
+	vec3 lightDir, ambient, diffuse, specular;
+	for (int i = 0; i < DIR_LIGHTS_NUM; i ++)
+	{	
+		lightDir = normalize(-dirLights[i].direction);
+		ambient += calcAmbient(dirLights[i].ambient);
+		diffuse += calcDiffuse(dirLights[i].diffuse, normal, lightDir);
+		specular += calcSpecular(dirLights[i].specular, normal, lightDir, viewDir);
+	}
 	return (ambient + diffuse + specular);
 }
 
-vec3 processPointLight(PointLight light, vec3 normal, vec3 viewDir)
+vec3 processPointLights(vec3 normal, vec3 viewDir)
 {
-	vec3 lightDir = normalize(light.position - FragPos);
-	vec3 ambient = calcAmbient(light.ambient);
-	vec3 diffuse = calcDiffuse(light.diffuse, normal, lightDir);
-	vec3 specular = calcSpecular(light.specular, normal, lightDir, viewDir);
+	vec3 lightDir, ambient, diffuse, specular;
+	for (int i = 0; i < POINT_LIGHTS_NUM; i ++)
+	{
+		lightDir = normalize(pointLights[i].position - FragPos);
+		//calculate attenuation
+		float dis = length(pointLights[i].position - FragPos);
+		float attenuation = 1.0 / (pointLights[i].constant + pointLights[i].linear*dis + 
+			pointLights[i].quadra*(dis*dis));
 
-	//calculate attenuation
-	float distance = length(light.position - FragPos);
-	float attenuation = 1.0 / (light.constant + light.linear*distance + light.quadra*(distance*distance));
-
-	return (ambient + diffuse + specular) * attenuation;
+		ambient += calcAmbient(pointLights[i].ambient) * attenuation; 
+		diffuse += calcDiffuse(pointLights[i].diffuse, normal, lightDir) * attenuation;
+		specular += calcSpecular(pointLights[i].specular, normal, lightDir, viewDir) * attenuation;
+	}
+	
+	return (ambient + diffuse + specular);
 }
 
-vec3 processSpotLight(SpotLight light, vec3 normal, vec3 viewDir)
+vec3 processSpotLights(vec3 normal, vec3 viewDir)
 {
-	vec3 lightDir = normalize(light.position - FragPos);
-	//calculate theta, angle between light direction and frag direction
-	float theta = dot(lightDir, normalize(-light.direction));
-	float epsilon = light.inner_cutoff - light.outer_cutoff;
-	float intensity = clamp((theta - light.outer_cutoff) / epsilon, 0.0, 1.0);
-	vec3 ambient, diffuse, specular;
-	//do light calculation
-	ambient = calcAmbient(light.ambient);
-	diffuse = calcDiffuse(light.diffuse, normal, lightDir);
-	specular = calcSpecular(light.specular, normal, lightDir, viewDir);
+	vec3 lightDir, ambient, diffuse, specular;
+	for (int i = 0; i < SPOT_LIGHTS_NUM; i ++)
+	{
+		lightDir = normalize(spotLights[i].position - FragPos);
+		//calculate theta, angle between light direction and frag direction
+		float theta = dot(lightDir, normalize(-spotLights[i].direction));
+		float epsilon = spotLights[i].inner_cutoff - spotLights[i].outer_cutoff;
+		float intensity = clamp((theta - spotLights[i].outer_cutoff) / epsilon, 0.0, 1.0);
 
-	return ambient + intensity * (diffuse + specular);
+		//do light calculation
+		ambient += calcAmbient(spotLights[i].ambient);
+		diffuse += calcDiffuse(spotLights[i].diffuse, normal, lightDir) * intensity;
+		specular += calcSpecular(spotLights[i].specular, normal, lightDir, viewDir) * intensity;
+	}
+
+	return (ambient + diffuse + specular);
 }
 
 vec3 calcAmbient(vec3 light_amb)

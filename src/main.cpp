@@ -1,4 +1,5 @@
 #define STB_IMAGE_IMPLEMENTATION
+#define PI 3.14159265
 #include "../include/glad/glad.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -18,15 +19,12 @@
 #include "../include/pointLight.h"
 #include "../include/spotLight.h"
 
-#define PI 3.14159265
 using namespace std;
 using namespace glm;
 
-
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
-const int dirLightsNum = 1;
-const int pointLightsNum = 4;
+const string window_name = "This is Light";
 const string vshader_path = "../resources/shader/vshader.vs";
 const string fshader_path = "../resources/shader/fshader.fs";
 const string light_fshader_path = "../resources/shader/light.fs";
@@ -46,39 +44,10 @@ GLboolean MOUSE_VERTICAL_INVERSE = true;
 GLboolean MOUSE_HORIZONTAL_INVERSE = false;
 
 int main(){
-	//initiate glfw and window
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-#ifdef __APPLE__
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
-
-	// glfw window creation
-	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "This is Light", 
-		NULL, NULL);
-	if (window == NULL)
-	{
-		cout << "Failed to create GLFW window" << endl;
-		glfwTerminate();
+	GLFWwindow *window = init(SCR_WIDTH, SCR_HEIGHT, window_name);
+	if(window == NULL)
 		return -1;
-	}
-
-	glfwMakeContextCurrent(window);
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	glfwSetCursorPosCallback(window, mouse_callback);
-	glfwSetScrollCallback(window, scroll_callback);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	//load glad
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
-		cout << "Failed to load glad" << endl;
-		return -1;
-	}
-
-	glEnable(GL_DEPTH_TEST);
+	
 	if(MOUSE_VERTICAL_INVERSE)
 		camera.setMouseVerticalInverse(true);
 	if(MOUSE_HORIZONTAL_INVERSE)
@@ -120,16 +89,23 @@ int main(){
 	//--------------------------configure light------------------------------//
 	//direction/position, ambient, diffuse, specular, direction
 	lightShader.use();
-	DirLight dirLights[dirLightsNum] = {
-		DirLight(vec3(-0.2, -1.0, -0.3), vec3 (0.2f), vec3(0.8f), vec3(1.0f))
+	const int dirLightsNum = 1;
+	const int pointLightsNum = 2;
+	const int spotLightsNum = 2;
+	DirLight dirLights[] = {
+		DirLight(vec3(1.0, 1.0, 1.0), vec3(-0.2, -1.0, -0.3), vec3(0.05f), vec3(0.2f), vec3(0.8f))
 	};
 
-	PointLight pointLights[pointLightsNum] = {
-		PointLight(vec3(1.0, 2.0, 2.0), vec3(0.2f), vec3(0.8f), vec3(1.0f), 50.0f),
-		PointLight(vec3(1.0, 2.0, -2.0), vec3(0.2f), vec3(0.8f), vec3(1.0f), 50.0f),
-		PointLight(vec3(0.0, 0.0, -10.0), vec3(0.2f), vec3(0.8f), vec3(1.0f), 10.0f),
-		PointLight(vec3(-2.0, -2.0, -3.0), vec3(0.2f), vec3(0.8f), vec3(1.0f), 30.0f)
+	PointLight pointLights[] = {
+		PointLight(vec3(3.0, 2.0, -1.0), 50.0f),
+		PointLight(vec3(0.0, 0.0, -15.0), 50.0f)
 	};
+
+	SpotLight spotLights[] = {
+		SpotLight(vec3(-1.0, -2.0, -2.0), vec3(1.0, 2.0, 2.0), 20.0, 22.0),
+		SpotLight(vec3(-3.0, -2.0, -1.0), vec3(3.0, 2.0, -1.0), 20.0, 23.0)
+	};
+	spotLights[0].color = vec3(0.0, 1.0, 0.0);
 	
 	//--------------------------material and texture----------------------------//
 	unsigned int diffuse_map, specular_map, emission_map;
@@ -169,8 +145,9 @@ int main(){
 			0.1f, 100.0f);
 
 		//light
-		sendDirLights(dirLights, dirLightsNum, lightShader);
-		sendPointLights(pointLights, pointLightsNum, lightShader);
+		//sendDirLights(dirLights, dirLightsNum, lightShader);
+		//sendPointLights(pointLights, pointLightsNum, lightShader);
+		sendSpotLights(spotLights, spotLightsNum, lightShader);
 
 		lightShader.setMat4("view", view);
 		lightShader.setMat4("proj", proj);
@@ -199,6 +176,7 @@ int main(){
 		}
 		//drawing lamp
 		lampShader.use();
+		//drawing point lights
 		for (int i = 0; i < pointLightsNum; i ++)
 		{
 			mat4 lampModel;
@@ -207,6 +185,20 @@ int main(){
 			lampShader.setMat4("model", lampModel);
 			lampShader.setMat4("view", view);
 			lampShader.setMat4("proj", proj);
+			lampShader.setVec3("lightColor", pointLights[i].color);
+			glBindVertexArray(lampVAO);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+		//drawingg spot lights
+		for (int i = 0; i < spotLightsNum; i ++)
+		{
+			mat4 lampModel;
+			lampModel = translate(lampModel, spotLights[i].position);
+			lampModel = scale(lampModel, vec3(0.2f));
+			lampShader.setMat4("model", lampModel);
+			lampShader.setMat4("view", view);
+			lampShader.setMat4("proj", proj);
+			lampShader.setVec3("lightColor", spotLights[i].color);
 			glBindVertexArray(lampVAO);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
