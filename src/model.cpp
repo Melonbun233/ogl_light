@@ -15,14 +15,16 @@ void Model::loadModel(const string path)
 	Importer importer;
 	//get scene using assimp
 	const aiScene *scene = importer.ReadFile(path.c_str(), aiProcess_Triangulate | 
-		aiProcess_FlipUVs);
+		aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
 	//check scene
 	if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
 		cout << "ERROR::ASSIMP::" << importer.GetErrorString() << endl;
 	}
 	directory = path.substr(0, path.find_last_of('/'));
+	cout << "3d object loaded" << endl;
 	processNode(scene->mRootNode, scene);
+	cout << "3d object processed" << endl;
 }
 
 void Model::processNode(aiNode *root, const aiScene *scene)
