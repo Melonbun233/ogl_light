@@ -21,6 +21,7 @@
 #include "pointLight.h"
 #include "spotLight.h"
 #include "mesh.h"
+#include "model.h"
 
 using namespace std;
 

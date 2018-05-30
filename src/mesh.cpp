@@ -46,11 +46,11 @@ void Mesh::render(Shader &shader)
 	{
 		glActiveTexture(GL_TEXTURE0 + i); 
 		string name;
-		if(textures[i].type == ambient)
+		if(textures[i].type == "ambient")
 			name = "ambient[" + to_string(counter_amb++) + "]";
-		else if(textures[i].type == diffuse)
+		else if(textures[i].type == "diffuse")
 			name = "diffuse[" + to_string(counter_diff++) + "]";
-		else
+		else if(textures[i].type == "specular")
 			name = "specular[" + to_string(counter_spec++) + "]";
 		//else if(textures[i].type == emission)
 		//	name = "emission[" + to_string(counter_emis++) + "]";

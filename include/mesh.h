@@ -1,3 +1,5 @@
+#ifndef MESH_H
+#define MESH_H
 //this is a mesh class that containes an object's vertices, indices and textures
 //this class also contains rendering functions
 #include <vector>
@@ -7,9 +9,9 @@
 #include <GLFW/glfw3.h>
 
 #include "shader.h"
-#include "../include/glm/glm.hpp"
+#include "glm/glm.hpp"
 
-enum TexType {
+enum TextureType {
 	ambient,
 	diffuse,
 	specular
@@ -24,7 +26,8 @@ struct Vertex {
 
 struct Texture {
 	unsigned int ID;
-	TexType type;
+	std::string type;
+	std::string path;
 };
 
 
@@ -36,12 +39,17 @@ public:
 	std::vector<Texture> textures;
 	//default constructor
 	Mesh() = default;
-
 	//complete constructor
 	Mesh(std::vector<Vertex> &vertex, std::vector<unsigned int> &index, std::vector<Texture> &tex):
 		vertices(vertex), indices(index), textures(tex){
 			setup();
 		}
+
+	~Mesh()
+	{
+		glDeleteVertexArrays(1, &VAO);
+		glDeleteBuffers(1, &VBO);
+	}
 
 	//this function should be called every time you changed mesh's data
 	void setup();
@@ -51,3 +59,5 @@ private:
 	//rendering data
 	unsigned int VAO, VBO, EBO;
 };
+
+#endif
