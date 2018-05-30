@@ -1,7 +1,7 @@
 {
     "asset": {
         "version": "2.0",
-        "generator": "Open Asset Import Library (assimp v4.1.137461035)"
+        "generator": "Open Asset Import Library (assimp v4.1.257672176)"
     },
     "accessors": [
         {
@@ -70,7 +70,7 @@
     "buffers": [
         {
             "byteLength": 840,
-            "uri": "/Users/melonbun/workspace/project/learnOpengl/LightPractice/assimp-4.1.0/test/models/glTF2/BoxTextured-glTF/BoxTextured_out.bin"
+            "uri": "C:/Users/Melonbun/Workspace/project/LightPractice/assimp-4.1.0/test/models/glTF2/BoxTextured-glTF/BoxTextured_out.bin"
         }
     ],
     "bufferViews": [
