@@ -1,23 +1,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define PI 3.14159265
-#include "../include/glad/glad.h"
+#include "glad/glad.h"
 #include <GLFW/glfw3.h>
-#include <iostream>
-#include <string>
-
-#include "../include/glm/glm.hpp"
-#include "../include/glm/gtc/matrix_transform.hpp"
-#include "../include/glm/gtc/type_ptr.hpp"
-
-#include "../include/camera.h"
-#include "../include/shader.h"
-#include "../include/config.h"
-#include "../include/data.h"
-#include "../include/utils.h"
-#include "../include/light.h"
-#include "../include/dirLight.h"
-#include "../include/pointLight.h"
-#include "../include/spotLight.h"
+#include "config.h" //include all necessary header files
 
 using namespace std;
 using namespace glm;
@@ -33,8 +18,9 @@ const string lamp_fshader_path = "../resources/shader/lamp.fs";
 float delta_time = 0.0;
 float current_frame = 0.0;
 float last_frame = 0.0;
-extern float cube_vertices[];
-extern vec3 cube_pos[];
+
+const extern float cube_vertices[];
+const extern vec3 cube_pos[];
 
 //setting up camera
 Camera camera = Camera(vec3(0, 0, 6));
@@ -121,11 +107,13 @@ int main(){
 	loadTexture(emission_path, emission_map);
 
 	lightShader.use();
-	lightShader.setInt("material.ambient", 0);  //TEXTURE0
-	lightShader.setInt("material.diffuse", 1);	//TEXTURE1
-	lightShader.setInt("material.specular", 2);	//TEXTURE2
-	lightShader.setInt("material.emission", 3); //TEXTURE3
+	lightShader.setInt("material.ambient[0]", 0);  //TEXTURE0
+	lightShader.setInt("material.diffuse[0]", 1);	//TEXTURE1
+	lightShader.setInt("material.specular[0]", 2);	//TEXTURE2
 	lightShader.setFloat("material.shininess", 64.0);
+	lightShader.setInt("material.amb_num", 1);
+	lightShader.setInt("material.diff_num", 1);
+	lightShader.setInt("material.spec_num", 1);
 	//-----------------------resndering loop---------------------------------//
 	while (!glfwWindowShouldClose(window)){
 		processInput(window);

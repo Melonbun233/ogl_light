@@ -4,9 +4,23 @@
 //variables that are used in main function.
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
+//including all necessary header files
 #include <iostream>
+#include <string>
+
 #include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
+
 #include "camera.h"
+#include "shader.h"
+#include "data.h"
+#include "utils.h"
+#include "light.h"
+#include "dirLight.h"
+#include "pointLight.h"
+#include "spotLight.h"
+#include "mesh.h"
 
 using namespace std;
 

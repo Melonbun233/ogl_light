@@ -1,10 +1,15 @@
 #version 330 core
+#define LIGHTS_LIMIT 10
+#define TEXTURE_LIMIT 5
 
 struct Material{
-	sampler2D ambient;
-	sampler2D diffuse;
-	sampler2D specular;
-	sampler2D emission;
+	sampler2D ambient[TEXTURE_LIMIT];
+	sampler2D diffuse[TEXTURE_LIMIT];
+	sampler2D specular[TEXTURE_LIMIT];
+
+	int amb_num;
+	int diff_num;
+	int spec_num;
 	float shininess;
 };
 
@@ -42,7 +47,6 @@ in vec3 FragPos;
 in vec3 Normal;
 out vec4 FragColor;
 
-#define LIGHTS_LIMIT 10
 uniform int DIR_LIGHTS_NUM;
 uniform int POINT_LIGHTS_NUM;
 uniform int SPOT_LIGHTS_NUM;
@@ -133,20 +137,32 @@ vec3 processSpotLights(vec3 normal, vec3 viewDir)
 
 vec3 calcAmbient(vec3 light_amb)
 {
-	return light_amb * vec3(texture(material.ambient, TexCoords));
+	vec3 tex = vec3(0, 0, 0);
+	for (int i = 0; i < material.amb_num; i ++){
+		tex += vec3(texture(material.ambient[i], TexCoords));
+	}
+	return light_amb * tex;
 }
 
 vec3 calcDiffuse(vec3 light_diff, vec3 normal, vec3 lightDir)
 {
+	vec3 tex = vec3(0, 0, 0);
 	float diff = max(dot(normal, lightDir), 0.0);
-	return light_diff * diff * vec3(texture(material.diffuse, TexCoords));
+	for (int i = 0; i < material.diff_num; i ++){
+		tex = vec3(texture(material.diffuse[i], TexCoords));
+	}
+	return light_diff * diff * tex;
 }
 
 vec3 calcSpecular(vec3 light_spec, vec3 normal, vec3 lightDir, vec3 viewDir)
 {
+	vec3 tex = vec3(0, 0, 0);
 	vec3 reflectDir = reflect(-lightDir, normal);
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-	return light_spec * spec * vec3(texture(material.specular, TexCoords));
+	for (int i = 0; i < material.spec_num; i ++){
+		tex = vec3(texture(material.specular[i], TexCoords));
+	}
+	return light_spec * spec * tex;
 }
 
 
