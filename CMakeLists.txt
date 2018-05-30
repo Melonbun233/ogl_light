@@ -12,17 +12,23 @@ set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
-add_subdirectory(glfw-3.2.1)
-add_subdirectory(assimp-4.1.0)
+add_subdirectory(libs/glfw-3.2.1)
+add_subdirectory(libs/assimp-4.1.0)
 
 #include header files
-include_directories(include)
+include_directories(
+	include/
+	libs/glfw-3.2.1/include/ 
+	libs/assimp-4.1.0/include/
+	build/libs/assimp-4.1.0/include/
+	)
 file(GLOB SOURCES "src/*.c*")
 
 add_executable(LightPractice ${SOURCES})
 
 #find_package(glfw3 REQUIRED)
-target_link_libraries(LightPractice glfw)
+target_link_libraries(LightPractice glfw assimp)
+
 
 
 
