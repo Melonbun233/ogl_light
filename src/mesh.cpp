@@ -61,6 +61,10 @@ void Mesh::render(Shader &shader)
 	shader.setInt("material.amb_num", counter_amb);
 	shader.setInt("material.diff_num", counter_diff);
 	shader.setInt("material.spec_num", counter_spec);
+	shader.setVec3("material.ambient", material.ambient);
+	shader.setVec3("material.diffuse", material.diffuse);
+	shader.setVec3("material.specular", material.specular);
+	shader.setFloat("material.shininess", material.shininess);
 	//draw mesh
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);

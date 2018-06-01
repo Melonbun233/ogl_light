@@ -6,6 +6,7 @@ using namespace glm;
 
 void Model::render(Shader shader)
 {
+	shader.use();
 	for (unsigned int i = 0; i < meshes.size(); i++)
 		meshes[i].render(shader);
 }
@@ -69,7 +70,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
 			indices.push_back(face.mIndices[j]);
 	}
 
-	//process material
+	//process textures
 	aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
 	//load all ambient maps to textures
 	vector<Texture> ambientMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, 
@@ -84,7 +85,19 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
 		"specular");
 	textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
-	return Mesh(vertices, indices, textures);
+	//process material
+	aiColor3D ambient, diffuse, specular;
+	float shininess;
+	material->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
+	material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
+	material->Get(AI_MATKEY_COLOR_SPECULAR, specular);
+	material->Get(AI_MATKEY_SHININESS, shininess);
+
+	Material mat = {vec3(ambient.r, ambient.g, ambient.b), 
+					vec3(diffuse.r, diffuse.g, diffuse.b),
+					vec3(specular.r, specular.g, specular.b),
+					shininess};
+	return Mesh(vertices, indices, textures, mat);
 }
 
 vector<Texture> Model::loadMaterialTextures(aiMaterial *material, aiTextureType type, 

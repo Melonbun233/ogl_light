@@ -3,13 +3,16 @@
 #define TEXTURE_LIMIT 5
 
 struct Material{
-	sampler2D ambient[TEXTURE_LIMIT];
-	sampler2D diffuse[TEXTURE_LIMIT];
-	sampler2D specular[TEXTURE_LIMIT];
-
+	sampler2D tex_ambient[TEXTURE_LIMIT];
+	sampler2D tex_diffuse[TEXTURE_LIMIT];
+	sampler2D tex_specular[TEXTURE_LIMIT];
 	int amb_num;
 	int diff_num;
 	int spec_num;
+
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
 	float shininess;
 };
 
@@ -78,6 +81,10 @@ void main()
 	result += processDirLights(norm, viewDir);
 	result += processPointLights(norm, viewDir);
 	result += processSpotLights(norm, viewDir);
+	if(result == vec3(0))	//no light in this shader, add ambient light manually
+	{
+		result += calcAmbient(vec3(0.2));
+	}
 
 	FragColor = vec4(result, 1.0);
 
@@ -138,18 +145,12 @@ vec3 processSpotLights(vec3 normal, vec3 viewDir)
 vec3 calcAmbient(vec3 light_amb)
 {
 	vec3 tex = vec3(0, 0, 0);
-	if (material.amb_num == 0)	//no ambient map, use diffuse maps instead
-	{
-		for (int i = 0; i < material.diff_num; i ++)
-		{
-			tex+= vec3(texture(material.diffuse[i], TexCoords));
-		}
-	}
+	if (material.amb_num == 0)	//no ambient map, use material's own ambient
+		tex = material.ambient;
 	else
 	{
-		for (int i = 0; i < material.amb_num; i ++){
-			tex += vec3(texture(material.ambient[i], TexCoords));
-		}
+		for (int i = 0; i < material.amb_num; i ++)
+			tex += vec3(texture(material.tex_ambient[i], TexCoords));
 	}
 	
 	return light_amb * tex;
@@ -159,8 +160,13 @@ vec3 calcDiffuse(vec3 light_diff, vec3 normal, vec3 lightDir)
 {
 	vec3 tex = vec3(0, 0, 0);
 	float diff = max(dot(normal, lightDir), 0.0);
-	for (int i = 0; i < material.diff_num; i ++){
-		tex = vec3(texture(material.diffuse[i], TexCoords));
+
+	if (material.diff_num == 0) //no diffuse map, use material's own diffuse
+		tex = material.diffuse;
+	else 
+	{
+		for (int i = 0; i < material.diff_num; i ++)
+			tex += vec3(texture(material.tex_diffuse[i], TexCoords));
 	}
 	return light_diff * diff * tex;
 }
@@ -170,9 +176,15 @@ vec3 calcSpecular(vec3 light_spec, vec3 normal, vec3 lightDir, vec3 viewDir)
 	vec3 tex = vec3(0, 0, 0);
 	vec3 reflectDir = reflect(-lightDir, normal);
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-	for (int i = 0; i < material.spec_num; i ++){
-		tex = vec3(texture(material.specular[i], TexCoords));
+
+	if (material.spec_num == 0) //no specular map, use material's own specular
+		tex = material.specular;
+	else 
+	{
+		for (int i = 0; i < material.spec_num; i ++)
+			tex = vec3(texture(material.tex_specular[i], TexCoords));
 	}
+
 	return light_spec * spec * tex;
 }
 

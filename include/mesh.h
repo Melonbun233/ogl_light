@@ -23,18 +23,22 @@ struct Texture {
 	std::string path;
 };
 
+//material for this mesh
+struct Material {
+	glm::vec3 ambient;
+	glm::vec3 diffuse;
+	glm::vec3 specular;
+	float shininess;
+};
+
 
 class Mesh {
 public: 
-	//mesh data
-	std::vector<Vertex> vertices;
-	std::vector<unsigned int> indices;
-	std::vector<Texture> textures;
 	//default constructor
 	Mesh() = default;
 	//complete constructor
-	Mesh(std::vector<Vertex> &vertex, std::vector<unsigned int> &index, std::vector<Texture> &tex):
-		vertices(vertex), indices(index), textures(tex){
+	Mesh(std::vector<Vertex> &vertex, std::vector<unsigned int> &index, std::vector<Texture> &tex, 
+		Material mat): vertices(vertex), indices(index), textures(tex), material(mat){
 			setup();
 		}
 	//this function should be called every time you changed mesh's data
@@ -44,6 +48,11 @@ public:
 private:
 	//rendering data
 	unsigned int VAO, VBO, EBO;
+	//mesh data
+	std::vector<Vertex> vertices;
+	std::vector<unsigned int> indices;
+	std::vector<Texture> textures;
+	Material material;
 };
 
 #endif
