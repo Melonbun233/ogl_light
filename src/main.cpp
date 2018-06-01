@@ -38,7 +38,7 @@ int main(){
 	//configure paths
 	const string vshader_path = "../resources/shader/vshader.vs";
 	const string fshader_path = "../resources/shader/light.fs";
-	const string nano_path = "../resources/objects/girl/WhipperNude.blend";
+	const string nano_path = "../resources/objects/aventador/Avent.obj";
 	//slime/DirtSlime.fbx";
 
 	Shader nano_shader(vshader_path, fshader_path);
