@@ -138,9 +138,20 @@ vec3 processSpotLights(vec3 normal, vec3 viewDir)
 vec3 calcAmbient(vec3 light_amb)
 {
 	vec3 tex = vec3(0, 0, 0);
-	for (int i = 0; i < material.amb_num; i ++){
-		tex += vec3(texture(material.ambient[i], TexCoords));
+	if (material.amb_num == 0)	//no ambient map, use diffuse maps instead
+	{
+		for (int i = 0; i < material.diff_num; i ++)
+		{
+			tex+= vec3(texture(material.diffuse[i], TexCoords));
+		}
 	}
+	else
+	{
+		for (int i = 0; i < material.amb_num; i ++){
+			tex += vec3(texture(material.ambient[i], TexCoords));
+		}
+	}
+	
 	return light_amb * tex;
 }
 

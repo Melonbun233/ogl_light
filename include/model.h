@@ -23,14 +23,13 @@ public:
 	Model(const std::string &path) {loadModel(path);}
 	//call this function to render the model with provided shader
 	void render(Shader shader);
-
-private:
 	//model data
 	std::vector<Mesh> meshes;
 	//store loaded textures to optimize
 	std::vector<Texture> textures_loaded; 
 	std::string directory;
 
+private:
 	//load the model using assimp
 	void loadModel(const std::string path);
 	//recursively process each node and it's children

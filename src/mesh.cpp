@@ -22,16 +22,16 @@ void Mesh::setup()
 	//vertex positions
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-		(void*)offsetof(Vertex, position));
+		(void*)0);
 	//normal positions
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 
 		(void*)offsetof(Vertex, normal));
 	//texture coords
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), 
 		(void*)offsetof(Vertex, texCoords));
-	//unbind VAO
+
 	glBindVertexArray(0);
 }
 
@@ -65,4 +65,6 @@ void Mesh::render(Shader &shader)
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
+
+	glActiveTexture(GL_TEXTURE0);
 }

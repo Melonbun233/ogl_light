@@ -11,13 +11,6 @@
 #include "shader.h"
 #include "glm/glm.hpp"
 
-enum TextureType {
-	ambient,
-	diffuse,
-	specular
-	//emission; //not used
-};
-
 struct Vertex {
 	glm::vec3 position;
 	glm::vec3 normal;
@@ -44,13 +37,6 @@ public:
 		vertices(vertex), indices(index), textures(tex){
 			setup();
 		}
-
-	~Mesh()
-	{
-		glDeleteVertexArrays(1, &VAO);
-		glDeleteBuffers(1, &VBO);
-	}
-
 	//this function should be called every time you changed mesh's data
 	void setup();
 	//draw the mesh using provided shader

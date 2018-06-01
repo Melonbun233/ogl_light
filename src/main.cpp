@@ -37,24 +37,20 @@ int main(){
 
 	//configure paths
 	const string vshader_path = "../resources/shader/vshader.vs";
-	const string fshader_path = "../resources/shader/fshader.fs";
-	const string light_fshader_path = "../resources/shader/light.fs";
-	const string lamp_fshader_path = "../resources/shader/lamp.fs";
+	const string fshader_path = "../resources/shader/light.fs";
 	const string nano_suit_path = "../resources/models/nanosuit/nanosuit.obj";
 
-	Shader nano_suit_shader(vshader_path, light_fshader_path);
+	Shader shader(vshader_path, fshader_path);
 	//--------------------------models---------------------------------------//
 	Model nano_suit(nano_suit_path);
-
 	//--------------------------configure light------------------------------//
 	//direction/position, ambient, diffuse, specular, direction
-	nano_suit_shader.use();
-	const int dirLightsNum = 2;
-	const int pointLightsNum = 2;
-	const int spotLightsNum = 2;
+	const int dirLightsNum = 1;
+	const int pointLightsNum = 0;
+	const int spotLightsNum = 0;
 	DirLight dirLights[] = {
-		DirLight(vec3(1.0, 1.0, 1.0), vec3(-0.2, -1.0, -0.3), vec3(0.1), vec3(0.3), vec3(0.8)),
-		DirLight(vec3(1.0, 0.0, 0.0), vec3(0.2, 1.0, 0.3), vec3(0.1), vec3(0.3), vec3(0.8))
+		DirLight(vec3(1.0, 1.0, 1.0), vec3(-0.2, -1.0, -0.3), vec3(0.1), vec3(0.8), vec3(1.0)),
+		DirLight(vec3(1.0, 0.0, 0.0), vec3(0.2, 1.0, 0.3), vec3(0.1), vec3(0.8), vec3(1.0))
 	};
 
 	PointLight pointLights[] = {
@@ -81,7 +77,7 @@ int main(){
 
 		//update model, view, projection
 		//drawing main object
-		nano_suit_shader.use();
+		shader.use();
 		mat4 model, view, proj;
 		model = translate(model, vec3(0.0f, -1.75f, 0.0f));
 		model = scale(model, vec3(0.2f, 0.2f, 0.2f));
@@ -90,17 +86,18 @@ int main(){
 			0.1f, 100.0f);
 
 		//light
-		sendDirLights(dirLights, dirLightsNum, nano_suit_shader);
-		sendPointLights(pointLights, pointLightsNum, nano_suit_shader);
-		sendSpotLights(spotLights, spotLightsNum, nano_suit_shader);
+		sendDirLights(dirLights, dirLightsNum, shader);
+		sendPointLights(pointLights, pointLightsNum, shader);
+		sendSpotLights(spotLights, spotLightsNum, shader);
 
-		nano_suit_shader.setMat4("view", view);
-		nano_suit_shader.setMat4("proj", proj);
-		nano_suit_shader.setMat4("model", model);
-		nano_suit_shader.setVec3("viewPos", camera.Position);
+		shader.setMat4("view", view);
+		shader.setMat4("proj", proj);
+		shader.setMat4("model", model);
+		shader.setVec3("viewPos", camera.Position);
 
 		//draw objects
-		nano_suit.render(nano_suit_shader);
+		nano_suit.render(shader);
+		//container.render(shader);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

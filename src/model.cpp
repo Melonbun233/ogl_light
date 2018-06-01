@@ -14,17 +14,15 @@ void Model::loadModel(const string path)
 {
 	Importer importer;
 	//get scene using assimp
-	const aiScene *scene = importer.ReadFile(path.c_str(), aiProcess_Triangulate | 
-		aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
+	const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | 
+		aiProcess_FlipUVs);
 	//check scene
 	if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
 		cout << "ERROR::ASSIMP::" << importer.GetErrorString() << endl;
 	}
 	directory = path.substr(0, path.find_last_of('/'));
-	cout << "3d object loaded" << endl;
 	processNode(scene->mRootNode, scene);
-	cout << "3d object processed" << endl;
 }
 
 void Model::processNode(aiNode *root, const aiScene *scene)
@@ -48,6 +46,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
 	vector<unsigned int> indices;
 	vector<Texture> textures;
 
+	//process vertices
 	for (unsigned int i = 0; i < mesh->mNumVertices; i ++)
 	{
 		Vertex vertex;
@@ -55,13 +54,12 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
 		vertex.normal = vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
 		//check if the vertex has texture coordinates
 		if (mesh->mTextureCoords[0])
-			vertex.texCoords = vec2(mesh->mTextureCoords[0][i].x); 
+			vertex.texCoords = vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y); 
 			//we only consider the first set of texture coordinates
 		else
 			vertex.texCoords = vec2(0.0f, 0.0f);
 		vertices.push_back(vertex);
 	}
-
 	//process indices
 	//every face is processed into triangle
 	for (unsigned int i = 0; i < mesh->mNumFaces; i ++)
@@ -70,23 +68,21 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
 		for (unsigned int j = 0; j < face.mNumIndices; j++)
 			indices.push_back(face.mIndices[j]);
 	}
+
 	//process material
-	if(mesh->mMaterialIndex >= 0)
-	{
-		aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-		//load all ambient maps to textures
-		vector<Texture> ambientMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, 
-			"ambient");
-		textures.insert(textures.end(), ambientMaps.begin(), ambientMaps.end());
-		//load all diffuse maps to textures
-		vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, 
-			"diffuse");
-		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-		//load all specular maps to textures
-		vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR,
-			"specular");
-		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-	}
+	aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+	//load all ambient maps to textures
+	vector<Texture> ambientMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, 
+		"ambient");
+	textures.insert(textures.end(), ambientMaps.begin(), ambientMaps.end());
+	//load all diffuse maps to textures
+	vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, 
+		"diffuse");
+	textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+	//load all specular maps to textures
+	vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR,
+		"specular");
+	textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
 	return Mesh(vertices, indices, textures);
 }
